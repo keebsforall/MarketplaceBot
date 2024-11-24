@@ -196,17 +196,27 @@ class WebScraper:
         """
         Compares current listings with previous listings to find new ones.
         
+        The comparison is done by checking if each listing's URL exists in the previous listings,
+        since URLs should be unique identifiers for products. This is more reliable than comparing
+        the entire ProductListing object.
+        
         Returns:
-            List[ProductListing]: List of new product listings
+            List[ProductListing]: List of new product listings that weren't seen before
         """
         scraped_content = self.scrape_site(target_url=self.config.WEBSITE_URL)
         current_listings = self.get_current_listings(beautifulsoup_object=scraped_content)
         previous_listings = self.load_previous_listings()
         
+        # Create a set of previous URLs for faster lookup
+        previous_urls = {listing.url for listing in previous_listings}
+        
+        # Only keep listings whose URLs we haven't seen before
         new_listings = [
             listing for listing in current_listings 
-            if listing not in previous_listings
+            if listing.url not in previous_urls
         ]
+        
+        logging.debug(f"Found {len(new_listings)} new listings out of {len(current_listings)} current listings")
         
         self.save_listings(current_listings)
         return new_listings
