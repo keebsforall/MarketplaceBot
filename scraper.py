@@ -197,8 +197,8 @@ class WebScraper:
         Compares current listings with previous listings to find new ones.
         
         The comparison is done by checking if each listing's URL exists in the previous listings,
-        since URLs should be unique identifiers for products. This is more reliable than comparing
-        the entire ProductListing object.
+        since URLs should be unique identifiers for products. Also checks for duplicate product IDs
+        in the URL path to ensure we don't miss duplicates with slightly different URLs.
         
         Returns:
             List[ProductListing]: List of new product listings that weren't seen before
@@ -207,14 +207,27 @@ class WebScraper:
         current_listings = self.get_current_listings(beautifulsoup_object=scraped_content)
         previous_listings = self.load_previous_listings()
         
-        # Create a set of previous URLs for faster lookup
+        # Create a set of previous URLs and product IDs for faster lookup
         previous_urls = {listing.url for listing in previous_listings}
         
-        # Only keep listings whose URLs we haven't seen before
-        new_listings = [
-            listing for listing in current_listings 
-            if listing.url not in previous_urls
-        ]
+        # Extract product IDs from URLs (e.g., "65-1092" from the URL)
+        previous_ids = {url.split('/')[-1].split('-')[-1] for url in previous_urls}
+        
+        # Only keep listings whose URLs we haven't seen before AND whose product IDs are new
+        new_listings = []
+        for listing in current_listings:
+            # Extract the product ID from the current listing URL
+            try:
+                current_id = listing.url.split('/')[-1].split('-')[-1]
+                if (listing.url not in previous_urls) and (current_id not in previous_ids):
+                    new_listings.append(listing)
+                else:
+                    logging.debug(f"Skipping duplicate listing: {listing.url} (ID: {current_id})")
+            except IndexError:
+                logging.warning(f"Could not extract product ID from URL: {listing.url}")
+                # If we can't extract an ID, fall back to just URL comparison
+                if listing.url not in previous_urls:
+                    new_listings.append(listing)
         
         logging.debug(f"Found {len(new_listings)} new listings out of {len(current_listings)} current listings")
         
