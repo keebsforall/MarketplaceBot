@@ -27,5 +27,5 @@ class Config:
         self.DISCORD_CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
         self.WEBSITE_URL = "https://kfamarketplace.com/product/listing/?stock=in"
         self.BASE_URL = "https://kfamarketplace.com"
-        self.MONITORING_INTERVAL = 3600  # 1 hour in seconds
+        self.MONITORING_INTERVAL = 43200  # 12 hours in seconds
         self.DATA_FILE = "previous_listings.json"
