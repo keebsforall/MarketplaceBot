@@ -23,6 +23,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project files
 COPY . .
 
+# Set permissions for the file
+RUN touch previous_listings.json && \
+    chmod 666 previous_listings.json
+
 # Create a non-root user
 RUN useradd -m appuser && chown -R appuser:appuser /app
 USER appuser

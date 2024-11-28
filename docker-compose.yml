@@ -6,6 +6,8 @@ services:
     container_name: kfa-monitor
     volumes:
       - .:/app
+      - ./previous_listings.json:/app/previous_listings.json
+
     environment:
       - PYTHONUNBUFFERED=1
     env_file:
