@@ -5,4 +5,4 @@ discord.py==2.3.2
 schedule==1.2.1
 lxml==5.1.0
 Pillow==10.2.0
-openai==1.12.0
+openai==1.55.3
