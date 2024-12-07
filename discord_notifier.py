@@ -65,9 +65,9 @@ class DiscordNotifier:
             
             for listing in listings:
                 embed = discord.Embed(
-                    title=listing.name,
-                    url=listing.url,
-                    color=discord.Color.blue()
+                   title=listing.name,
+                   url=listing.url,
+                   color=discord.Color.orange()
                 )
                 embed.add_field(name="Price", value=f"${listing.price:.2f}")
                 embed.set_image(url=listing.image_url)
